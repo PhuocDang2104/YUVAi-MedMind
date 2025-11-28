@@ -1,0 +1,258 @@
+:root {
+  --bg: #f5f6fa;
+  --card: #ffffff;
+  --primary: #2563eb;
+  --text: #0f172a;
+  --muted: #6b7280;
+  --accent: #7c3aed;
+  --success: #16a34a;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --border: #e5e7eb;
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #f8fafc;
+  color: var(--text);
+  min-height: 100vh;
+}
+
+.persona-card {
+  transition: transform 220ms ease, box-shadow 220ms ease, border 220ms ease, background 220ms ease;
+}
+
+.persona-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+}
+
+.persona-card.active {
+  background: linear-gradient(135deg, #e0ecff, #eef2ff);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.shell {
+  max-width: none;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.grid {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  background: #eef2ff;
+  color: #312e81;
+}
+
+.section-title {
+  font-size: 18px;
+  margin: 0 0 8px;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.nav-bottom {
+  position: sticky;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-top: 12px;
+}
+
+.nav-bottom a {
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.nav-bottom a.active {
+  color: var(--text);
+  background: linear-gradient(180deg, rgba(37, 99, 235, 0.12), rgba(37, 99, 235, 0));
+}
+
+.sidebar {
+  width: 260px;
+  background: var(--card);
+  border-right: 1px solid var(--border);
+  padding: 16px 12px;
+  height: calc(100vh - 72px);
+  position: sticky;
+  top: 72px;
+  left: 0;
+  overflow-y: auto;
+}
+
+.sidebar .nav-group {
+  margin-bottom: 10px;
+}
+
+.sidebar .nav-group-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+.sidebar .nav-group-header:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.sidebar .nav-group-content {
+  padding-left: 6px;
+}
+
+.sidebar .nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: var(--text);
+}
+
+.sidebar .nav-link:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.sidebar .nav-link.active {
+  background: rgba(0, 0, 0, 0.08);
+  font-weight: 600;
+}
+
+.two-col {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 16px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+  background: var(--card);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  width: 100%;
+}
+
+.topbar .search {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 12px;
+  background: #f8fafc;
+}
+
+.topbar .search input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  outline: none;
+  color: var(--text);
+}
+
+.avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #111827;
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-rows: 72px 1fr;
+  min-height: 100vh;
+}
+
+.app-body {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 0;
+  width: 100%;
+}
+
+.layout {
+  display: contents;
+}
+
+.layout .content {
+  display: grid;
+  gap: 24px;
+  padding: 32px 36px 56px;
+  max-width: 1120px !important;
+  margin: 0 auto;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  .two-col {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    width: auto;
+  }
+  .nav-bottom {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    z-index: 10;
+  }
+}
