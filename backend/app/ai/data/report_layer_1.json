@@ -1,0 +1,18 @@
+{
+  "physical_summary": [
+    {
+      "time": "13:00",
+      "symptom": "feeling dizzy"
+    },
+    {
+      "time": "15:00",
+      "symptom": "shortness of breath"
+    },
+    {
+      "time": "17:00",
+      "symptom": "feeling depressed and sad"
+    }
+  ],
+  "mental_note": "feeling depressed and sad",
+  "warning_flag": true
+}

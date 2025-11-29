@@ -166,3 +166,22 @@ export type PatientMedicationPlan = {
     symptom?: string | null;
   }[];
 };
+
+export type AIChatMode = "summary" | "suggestion";
+
+export type AIChatReport = {
+  physical_summary?: { time: string; symptom: string; severity?: string | null }[];
+  mental_note?: string | null;
+  warning_flag?: boolean | null;
+};
+
+export type AIChatResponse = {
+  patient_id: string;
+  patient_name: string;
+  mode: AIChatMode;
+  layer: number;
+  message: string;
+  narrative?: string | null;
+  warning_flag?: boolean | null;
+  report?: AIChatReport | null;
+};

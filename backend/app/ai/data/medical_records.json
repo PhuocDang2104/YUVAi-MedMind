@@ -1,0 +1,14 @@
+{
+  "patient_id": "PT001",
+  "condition": "Heart Failure Stage 2",
+  "medications": [
+    {
+      "name": "Nitroglycerin",
+      "side_effects": ["headache", "mild dizziness", "low blood pressure"]
+    },
+    {
+      "name": "Beta blocker",
+      "side_effects": ["fatigue", "cold hands"]
+    }
+  ]
+}

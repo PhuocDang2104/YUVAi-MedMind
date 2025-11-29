@@ -12,7 +12,8 @@
 - `app/core/config.py` – settings (.env).
 - `app/db/session.py` – SessionLocal; `app/db/init_db.py` – quick dev schema via `create_all`.
 - `app/models/`, `app/schemas/` – SQLAlchemy models + Pydantic schemas.
-- `app/services/` – orchestration/AI stubs.
+- `app/ai/` – AI workspace (gateway, prompts, provider registry for OpenAI/vLLM/Ollama, docs in `app/ai/README.md`).
+- `app/services/` – orchestration/AI stubs wired to the AI workspace.
 - `tests/` – Pytest home.
 
 ## Schema (Postgres)

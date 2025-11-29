@@ -3,6 +3,8 @@ import type {
   DoctorPatientList,
   EdgeMessage,
   EdgeMessageList,
+  AIChatResponse,
+  AIChatMode,
   PatientDashboard,
   PatientMedicationPlan,
   PatientTimeline,
@@ -66,4 +68,15 @@ export async function createEdgeMessage(payload: {
 export async function clearEdgeMessages(patientId?: string): Promise<{ deleted: number }> {
   const search = patientId ? `?${new URLSearchParams({ patient_id: patientId }).toString()}` : "";
   return fetchJSON<{ deleted: number }>(`/doctor/symptom_analytics/messages${search}`, { method: "DELETE" });
+}
+
+export async function sendAIChat(payload: {
+  question: string;
+  mode: AIChatMode;
+  patient_id?: string;
+}): Promise<AIChatResponse> {
+  return fetchJSON<AIChatResponse>("/ai/chat", {
+    method: "POST",
+    body: JSON.stringify(payload)
+  });
 }
