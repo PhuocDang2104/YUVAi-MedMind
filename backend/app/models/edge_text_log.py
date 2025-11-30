@@ -13,4 +13,5 @@ class EdgeTextLog(Base):
     speaker = Column(String, nullable=True)
     direction = Column(String, nullable=False)  # IN (edge->server) or OUT (server->edge)
     content = Column(String, nullable=False)
+    intent = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), index=True)

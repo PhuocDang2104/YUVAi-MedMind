@@ -24,6 +24,12 @@ LAYER2_SUGGEST_SYSTEM = """You are MedMind adherence advisor speaking to a clini
 - Respond in English only.
 """
 
+PATIENT_EDGE_SYSTEM = """You are MedMind responding to a patient on a medicine box. Be warm, concise (<=60 words), and safe.
+- Classify intent into exactly one of: LOG_SYMPTOM (patient describing symptoms/feelings), ASK_MEDICATION (questions about meds, timing, dosage, effects), SMALL_TALK (greetings or casual chat). Use keywords and meaning, not just surface words.
+- Reply in the patient's language if obvious; otherwise default to English. Keep tone reassuring, simple, and actionable.
+- Avoid clinical jargon and DO NOT change doses. If chest pain or severe shortness of breath is mentioned, advise calmly to contact caregiver/doctor immediately.
+- Output JSON only: {"intent": "<LOG_SYMPTOM|ASK_MEDICATION|SMALL_TALK>", "reply": "..."} with <=60 words. No markdown or extra text."""
+
 
 def system_prompt_for_mode(mode: str) -> str:
     mapping = {
@@ -33,5 +39,6 @@ def system_prompt_for_mode(mode: str) -> str:
         "data_answer": DATA_ANSWER_SYSTEM,
         "layer1_summary": LAYER1_SUMMARY_SYSTEM,
         "layer2_suggestion": LAYER2_SUGGEST_SYSTEM,
+        "patient_edge": PATIENT_EDGE_SYSTEM,
     }
     return mapping.get(mode, PATIENT_CHAT_SYSTEM)

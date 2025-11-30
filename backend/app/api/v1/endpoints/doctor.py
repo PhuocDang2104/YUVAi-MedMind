@@ -21,6 +21,7 @@ from app.models import (
     SymptomLog,
     EdgeTextLog,
 )
+from app.ai import classify_and_reply_patient
 from app.schemas.doctor import (
     AlertItem,
     AdherenceKPIs,
@@ -571,6 +572,7 @@ def list_edge_messages(patient_id: str | None = None, db: Session = Depends(get_
                 speaker=row.speaker,
                 direction=row.direction,
                 content=row.content,
+                intent=row.intent,
                 created_at=row.created_at,
             )
         )
@@ -591,11 +593,38 @@ def create_edge_message(payload: EdgeMessageCreate, db: Session = Depends(get_db
         speaker=payload.speaker,
         direction=payload.direction,
         content=payload.content,
+        intent=payload.intent,
     )
     db.add(row)
+    auto_reply: EdgeMessage | None = None
+    if payload.direction == "IN":
+        intent, reply = _auto_reply_to_patient(payload.content)
+        row.intent = intent
+        out_id = str(uuid.uuid4())
+        out_row = EdgeTextLog(
+            id=out_id,
+            patient_id=patient.id,
+            device_id=device_id,
+            speaker="Assistant",
+            direction="OUT",
+            content=reply,
+            intent=intent,
+        )
+        db.add(out_row)
+        auto_reply = EdgeMessage(
+            id=out_id,
+            patient_id=patient.id,
+            patient_name=patient.full_name,
+            device_id=device_id,
+            speaker="Assistant",
+            direction="OUT",
+            content=reply,
+            intent=intent,
+            created_at=datetime.now(timezone.utc),
+        )
     db.commit()
     db.refresh(row)
-    return EdgeMessage(
+    return auto_reply or EdgeMessage(
         id=row.id,
         patient_id=patient.id,
         patient_name=patient.full_name,
@@ -603,6 +632,7 @@ def create_edge_message(payload: EdgeMessageCreate, db: Session = Depends(get_db
         speaker=row.speaker,
         direction=row.direction,
         content=row.content,
+        intent=row.intent,
         created_at=row.created_at,
     )
 
@@ -613,6 +643,15 @@ def clear_edge_messages(patient_id: str | None = None, db: Session = Depends(get
     deleted = db.query(EdgeTextLog).filter(EdgeTextLog.patient_id == patient.id).delete(synchronize_session=False)
     db.commit()
     return {"deleted": deleted}
+
+
+def _auto_reply_to_patient(text: str) -> tuple[str, str]:
+    import asyncio
+
+    try:
+        return asyncio.run(classify_and_reply_patient(text))
+    except Exception:
+        return "SMALL_TALK", "Thanks for sharing. Take care."
 
 
 @router.get("/patients/{patient_id}/timeline", response_model=PatientTimeline)

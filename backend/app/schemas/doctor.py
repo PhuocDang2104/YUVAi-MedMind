@@ -176,6 +176,7 @@ class EdgeMessage(BaseModel):
     speaker: str | None = None
     direction: str
     content: str
+    intent: str | None = None
     created_at: datetime
 
 
@@ -185,6 +186,7 @@ class EdgeMessageCreate(BaseModel):
     speaker: str | None = None
     direction: str
     content: str
+    intent: str | None = None
 
 
 class EdgeMessageList(BaseModel):

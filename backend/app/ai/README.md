@@ -10,6 +10,7 @@ Enterprise-ready landing zone to work with LLMs while keeping the FastAPI backen
 - `prompts.py` – system prompts per mode: `patient_chat`, `doctor_chat`, `symptom_extract`, `data_answer`, **layer1_summary**, **layer2_suggestion**.
 - `gateway.py` – orchestrator that builds messages with context/tool outputs and calls a provider.
 - `patient_layers.py` – merged AI demo logic (layer 1 summary + layer 2 advice) wired to Postgres data for patient flows.
+- `patient_responder.py` – patient-facing intent+reply (LOG_SYMPTOM / ASK_MEDICATION / SMALL_TALK) for auto-replies on the device chat.
 - `data/` – sample JSON copied from the original `ai_demo` (kept for reference).
 - `providers/` – pluggable clients (`openai_chat.py` for OpenAI/vLLM/TGI compatible endpoints, `ollama_chat.py` for on-prem inference).
 - `registry.py` – factory to choose a provider from config.
@@ -55,6 +56,11 @@ AI_CLIENT_TITLE=MedMind Portal
     ```
 - **Data sources**: `symptom_logs`, `medication_plans` + `medication_plan_items` (+ `medications`), `dose_occurrences`, `patient_profiles`, `patients.notes`. Side effects are hinted via a small default mapping (`Amlodipine`, `Atorvastatin`, `Nitroglycerin`, `Beta blocker`).
 - **Failover**: If the LLM provider rejects/401/timeout, the backend returns a deterministic fallback summary/suggestion so the UI still responds (narrative notes the fallback).
+
+## Patient auto-reply (Edge device chat)
+- Mode: `patient_edge` (see `prompts.py`).
+- Intent classifier + reply: `patient_responder.py` → used by `/doctor/symptom_analytics/messages` when direction=IN. It classifies intent into `LOG_SYMPTOM | ASK_MEDICATION | SMALL_TALK` and generates a short, patient-friendly reply. Both the incoming and auto-reply messages are stored in `edge_text_logs.intent`.
+- Frontend table shows `intent` in Edge Text Storage; when a message is marked as received, the backend auto-reply is created and logged.
 
 ## Use in backend code
 ```python

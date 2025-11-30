@@ -9,25 +9,11 @@ const DEFAULT_PATIENT_NAME = "Asha Pillai";
 
 const formatTime = (iso?: string) => (iso ? new Date(iso).toLocaleString("en-US") : "-");
 
-function generateReply(prompt: string) {
-  const trimmed = prompt.slice(0, 140);
-  const templates = [
-    `I hear you: "${trimmed}". Take a short rest and I will notify your doctor.`,
-    `Got it: "${trimmed}". Monitor how you feel in the next hour and keep water nearby.`,
-    `Noted: "${trimmed}". If it worsens, contact care immediately; I will log this now.`,
-    `Thanks for telling me: "${trimmed}". I'm syncing this to your care team and suggesting rest.`,
-    `Understood: "${trimmed}". Please sit down, breathe slowly, and I'll alert your doctor.`
-  ];
-  const idx = Math.floor(Math.random() * templates.length);
-  return templates[idx];
-}
-
 export default function SymptomAnalytics() {
   const [messages, setMessages] = useState<EdgeMessage[]>([]);
   const [patientName, setPatientName] = useState(DEFAULT_PATIENT_NAME);
   const [patientId, setPatientId] = useState<string | null>(null);
   const [incomingText, setIncomingText] = useState("");
-  const [replyPreview, setReplyPreview] = useState("");
   const [sendingState, setSendingState] = useState<"idle" | "receiving" | "replying" | "sent">("idle");
   const [error, setError] = useState<string | null>(null);
 
@@ -46,6 +32,11 @@ export default function SymptomAnalytics() {
     loadMessages();
   }, []);
 
+  const latestReply = useMemo(
+    () => messages.find((m) => m.direction === "OUT"),
+    [messages]
+  );
+
   const handleReceive = async () => {
     if (!incomingText.trim()) return;
     setError(null);
@@ -59,18 +50,6 @@ export default function SymptomAnalytics() {
         content: incomingText.trim()
       });
       setIncomingText("");
-      await loadMessages();
-      setSendingState("replying");
-      const reply = generateReply(incomingText.trim());
-      setReplyPreview(reply);
-      await new Promise((resolve) => setTimeout(resolve, 600));
-      await createEdgeMessage({
-        patient_id: patientId || undefined,
-        device_id: DEFAULT_DEVICE_ID,
-        speaker: "Assistant",
-        direction: "OUT",
-        content: reply
-      });
       await loadMessages();
       setSendingState("sent");
       setTimeout(() => setSendingState("idle"), 800);
@@ -88,7 +67,6 @@ export default function SymptomAnalytics() {
     try {
       await clearEdgeMessages(patientId);
       await loadMessages();
-      setReplyPreview("");
     } catch (err) {
       setError("Failed to clear messages.");
     }
@@ -125,15 +103,24 @@ export default function SymptomAnalytics() {
             <div className="label">Server → Device (auto reply)</div>
             <div className="reply-box">
               <div className="muted" style={{ fontSize: 12, marginBottom: 6 }}>
-                {sendingState === "replying" ? "Generating quick reply..." : sendingState === "sent" ? "Sent" : "Ready"}
+                {sendingState === "receiving" ? "Queuing..." : sendingState === "sent" ? "Sent" : "Ready"}
               </div>
-              <p style={{ margin: 0, minHeight: 60 }}>{replyPreview || "Reply will appear here after receiving."}</p>
+              <p style={{ margin: 0, minHeight: 60 }}>
+                {latestReply ? (
+                  <>
+                    {latestReply.intent ? <span className="pill soft" style={{ marginRight: 6 }}>{latestReply.intent}</span> : null}
+                    {latestReply.content}
+                  </>
+                ) : (
+                  "Replies are generated automatically using patient-friendly AI."
+                )}
+              </p>
             </div>
             <div className="status-row">
               <span className="status-dot" style={{ background: sendingState === "sent" ? "var(--success)" : "var(--warning)" }} />
               <span className="muted" style={{ fontSize: 12 }}>
-                {sendingState === "replying"
-                  ? "Sending..."
+                {sendingState === "receiving"
+                  ? "Processing..."
                   : sendingState === "sent"
                   ? "Reply sent back to device"
                   : "Awaiting incoming text"}
@@ -159,6 +146,7 @@ export default function SymptomAnalytics() {
             <span>Direction</span>
             <span>Speaker</span>
             <span>Device</span>
+            <span>Intent</span>
             <span>Timestamp</span>
             <span>Content</span>
           </div>
@@ -167,6 +155,7 @@ export default function SymptomAnalytics() {
               <span className={`pill soft ${m.direction === "IN" ? "info" : "warning"}`}>{m.direction === "IN" ? "Edge → Server" : "Server → Edge"}</span>
               <span>{m.speaker || "-"}</span>
               <span className="muted">{m.device_id || "-"}</span>
+              <span className="muted">{m.intent || "-"}</span>
               <span className="muted">{formatTime(m.created_at)}</span>
               <span>{m.content}</span>
             </div>

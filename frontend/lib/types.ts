@@ -140,6 +140,7 @@ export type EdgeMessage = {
   speaker?: string | null;
   direction: "IN" | "OUT";
   content: string;
+  intent?: string | null;
   created_at: string;
 };
 
